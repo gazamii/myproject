@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -8,10 +10,18 @@ export default function Home() {
         </div>
 
         <nav className="hidden gap-6 text-sm text-slate-600 md:flex">
-          <a href="#" className="hover:text-indigo-600">기능</a>
-          <a href="#" className="hover:text-indigo-600">로드맵</a>
-          <a href="#" className="hover:text-indigo-600">진단 시작</a>
-          <a href="#" className="hover:text-indigo-600">로그인</a>
+          <Link href="/" className="hover:text-indigo-600">
+            홈
+          </Link>
+          <Link href="/diagnosis" className="hover:text-indigo-600">
+            진단 시작
+          </Link>
+          <Link href="/result" className="hover:text-indigo-600">
+            샘플 결과
+          </Link>
+          <a href="#" className="hover:text-indigo-600">
+            로그인
+          </a>
         </nav>
       </header>
 
@@ -33,12 +43,19 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button className="rounded-2xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-indigo-700">
+            <Link
+              href="/diagnosis"
+              className="rounded-2xl bg-indigo-600 px-6 py-3 text-center font-semibold text-white shadow-md transition hover:bg-indigo-700"
+            >
               학점 진단 시작하기
-            </button>
-            <button className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-100">
+            </Link>
+
+            <Link
+              href="/result"
+              className="rounded-2xl border border-slate-300 bg-white px-6 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-100"
+            >
               샘플 결과 보기
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -116,9 +133,13 @@ export default function Home() {
             현재까지 들은 과목을 입력하고, 남은 학점과 다음 학기 계획을
             한 번에 확인해보세요.
           </p>
-          <button className="mt-8 rounded-2xl bg-white px-6 py-3 font-semibold text-indigo-700 transition hover:bg-slate-100">
+
+          <Link
+            href="/diagnosis"
+            className="mt-8 inline-block rounded-2xl bg-white px-6 py-3 font-semibold text-indigo-700 transition hover:bg-slate-100"
+          >
             지금 바로 진단하기
-          </button>
+          </Link>
         </div>
       </section>
     </main>
