@@ -1,6 +1,84 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function DiagnosisPage() {
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    department: "컴퓨터공학과",
+    admissionYear: "",
+    currentYear: "1학년",
+    careerGoal: "아직 미정",
+    totalCredits: "",
+    majorRequiredCredits: "",
+    majorElectiveCredits: "",
+    generalCredits: "",
+    freeDay: "없음",
+    preferredTime: "상관없음",
+    completedSubjects: [] as string[],
+  });
+
+  const subjects = [
+    "컴퓨터개론",
+    "프로그래밍입문",
+    "자료구조",
+    "객체지향프로그래밍",
+    "이산수학",
+    "선형대수",
+    "알고리즘",
+    "데이터베이스",
+  ];
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubjectChange = (subject: string) => {
+    setFormData((prev) => {
+      const alreadyIncluded = prev.completedSubjects.includes(subject);
+
+      return {
+        ...prev,
+        completedSubjects: alreadyIncluded
+          ? prev.completedSubjects.filter((item) => item !== subject)
+          : [...prev.completedSubjects, subject],
+      };
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("/api/diagnosis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("백엔드 응답 실패");
+      }
+
+      const result = await response.json();
+
+      localStorage.setItem("diagnosisResult", JSON.stringify(result));
+      router.push("/result");
+    } catch (error) {
+      console.error("Error submitting diagnosis data:", error);
+      alert("진단 요청 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -54,8 +132,15 @@ export default function DiagnosisPage() {
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">학과</label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  학과
+                </label>
+                <select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                >
                   <option>컴퓨터공학과</option>
                   <option>인공지능학과</option>
                   <option>서비스디자인공학과</option>
@@ -64,17 +149,29 @@ export default function DiagnosisPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">입학년도</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  입학년도
+                </label>
                 <input
                   type="text"
+                  name="admissionYear"
+                  value={formData.admissionYear}
+                  onChange={handleChange}
                   placeholder="예: 2024"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">현재 학년</label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  현재 학년
+                </label>
+                <select
+                  name="currentYear"
+                  value={formData.currentYear}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                >
                   <option>1학년</option>
                   <option>2학년</option>
                   <option>3학년</option>
@@ -83,8 +180,15 @@ export default function DiagnosisPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">희망 진로</label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  희망 진로
+                </label>
+                <select
+                  name="careerGoal"
+                  value={formData.careerGoal}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                >
                   <option>백엔드 개발</option>
                   <option>프론트엔드 개발</option>
                   <option>AI / 데이터</option>
@@ -103,36 +207,56 @@ export default function DiagnosisPage() {
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">총 취득 학점</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  총 취득 학점
+                </label>
                 <input
                   type="number"
+                  name="totalCredits"
+                  value={formData.totalCredits}
+                  onChange={handleChange}
                   placeholder="예: 54"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">전공 필수 이수 학점</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  전공 필수 이수 학점
+                </label>
                 <input
                   type="number"
+                  name="majorRequiredCredits"
+                  value={formData.majorRequiredCredits}
+                  onChange={handleChange}
                   placeholder="예: 18"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">전공 선택 이수 학점</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  전공 선택 이수 학점
+                </label>
                 <input
                   type="number"
+                  name="majorElectiveCredits"
+                  value={formData.majorElectiveCredits}
+                  onChange={handleChange}
                   placeholder="예: 15"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">교양 이수 학점</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  교양 이수 학점
+                </label>
                 <input
                   type="number"
+                  name="generalCredits"
+                  value={formData.generalCredits}
+                  onChange={handleChange}
                   placeholder="예: 21"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 />
@@ -140,23 +264,21 @@ export default function DiagnosisPage() {
             </div>
 
             <div className="mt-6">
-              <label className="mb-3 block text-sm font-medium text-slate-700">이수한 주요 과목</label>
+              <label className="mb-3 block text-sm font-medium text-slate-700">
+                이수한 주요 과목
+              </label>
               <div className="grid gap-3 sm:grid-cols-2">
-                {[
-                  "컴퓨터개론",
-                  "프로그래밍입문",
-                  "자료구조",
-                  "객체지향프로그래밍",
-                  "이산수학",
-                  "선형대수",
-                  "알고리즘",
-                  "데이터베이스",
-                ].map((subject) => (
+                {subjects.map((subject) => (
                   <label
                     key={subject}
                     className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700"
                   >
-                    <input type="checkbox" className="h-4 w-4 accent-indigo-600" />
+                    <input
+                      type="checkbox"
+                      checked={formData.completedSubjects.includes(subject)}
+                      onChange={() => handleSubjectChange(subject)}
+                      className="h-4 w-4 accent-indigo-600"
+                    />
                     {subject}
                   </label>
                 ))}
@@ -172,8 +294,15 @@ export default function DiagnosisPage() {
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">공강 희망 요일</label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  공강 희망 요일
+                </label>
+                <select
+                  name="freeDay"
+                  value={formData.freeDay}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                >
                   <option>금요일</option>
                   <option>수요일</option>
                   <option>없음</option>
@@ -181,8 +310,15 @@ export default function DiagnosisPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">선호 시간대</label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  선호 시간대
+                </label>
+                <select
+                  name="preferredTime"
+                  value={formData.preferredTime}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                >
                   <option>오전 수업 선호</option>
                   <option>오후 수업 선호</option>
                   <option>상관없음</option>
@@ -204,12 +340,14 @@ export default function DiagnosisPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/result"
+            <button
+              type="button"
+              onClick={handleSubmit}
               className="rounded-2xl bg-indigo-600 px-6 py-3 text-center font-semibold text-white shadow-md transition hover:bg-indigo-700"
             >
               진단 결과 보기
-            </Link>
+            </button>
+
             <Link
               href="/result"
               className="rounded-2xl border border-slate-300 bg-white px-6 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-100"
@@ -230,22 +368,24 @@ export default function DiagnosisPage() {
           <div className="mt-6 space-y-4">
             <div className="rounded-2xl bg-slate-100 p-4">
               <p className="text-sm text-slate-500">학과</p>
-              <p className="mt-1 font-semibold">컴퓨터공학과</p>
+              <p className="mt-1 font-semibold">{formData.department || "-"}</p>
             </div>
 
             <div className="rounded-2xl bg-slate-100 p-4">
               <p className="text-sm text-slate-500">현재 학년</p>
-              <p className="mt-1 font-semibold">2학년</p>
+              <p className="mt-1 font-semibold">{formData.currentYear || "-"}</p>
             </div>
 
             <div className="rounded-2xl bg-slate-100 p-4">
               <p className="text-sm text-slate-500">취득 학점</p>
-              <p className="mt-1 font-semibold">54학점</p>
+              <p className="mt-1 font-semibold">
+                {formData.totalCredits ? `${formData.totalCredits}학점` : "-"}
+              </p>
             </div>
 
             <div className="rounded-2xl bg-slate-100 p-4">
               <p className="text-sm text-slate-500">희망 진로</p>
-              <p className="mt-1 font-semibold">AI / 데이터</p>
+              <p className="mt-1 font-semibold">{formData.careerGoal || "-"}</p>
             </div>
 
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
