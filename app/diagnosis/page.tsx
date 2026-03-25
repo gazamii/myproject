@@ -22,14 +22,14 @@ export default function DiagnosisPage() {
   });
 
   const subjects = [
-    "컴퓨터개론",
-    "프로그래밍입문",
+    "it개론",
+    "웹프로그래밍기초",
     "자료구조",
-    "객체지향프로그래밍",
+    "파이썬프로그래밍",
     "이산수학",
-    "선형대수",
+    "미적분과 벡터해석 기초",
     "알고리즘",
-    "데이터베이스",
+    "C++ 프로그래밍",
   ];
 
   const handleChange = (
@@ -142,8 +142,8 @@ export default function DiagnosisPage() {
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500"
                 >
                   <option>컴퓨터공학과</option>
-                  <option>인공지능학과</option>
-                  <option>서비스디자인공학과</option>
+                  <option>AI융합학부</option>
+                  <option>융합보안공학과</option>
                   <option>복수전공 예정</option>
                 </select>
               </div>
